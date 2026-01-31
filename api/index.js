@@ -7,17 +7,21 @@ dotenv.config();
 
 const app = express();
 const PORT = 3000;
+const hintsCount = 3;
+
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY not found in environment");
+}
 
 // Initialize Gemini client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 app.use(cors());
 app.use(express.json());
 
 app.post("/api/getHints", async (req, res) => {
-  const { problemStatement, difficulty, hintsCount } = req.body;
+  const { problemStatement, difficulty} = req.body;
 
-  if (!problemStatement || !difficulty || typeof hintsCount !== "number") {
+  if (!problemStatement || !difficulty) {
     return res.status(400).json({ error: "Invalid request body" });
   }
 

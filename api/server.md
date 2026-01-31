@@ -51,7 +51,6 @@ Get hints for a LeetCode problem.
 {
   "problemStatement": "Two Sum: Given an array of integers...",
   "difficulty": "Easy",
-  "hintsCount": 3
 }
 ```
 
@@ -93,13 +92,12 @@ node test.js
 - Verify CORS is enabled for the Chrome extension origin
 
 ### "Invalid request body"
-- Ensure all required fields are present: `problemStatement`, `difficulty`, `hintsCount`
-- `hintsCount` must be a number
+- Ensure all required fields are present: `problemStatement`, `difficulty`
 
 ## Model Used
 
-- **Model:** `gemini-1.5-flash` (fast, efficient model)
-- Alternative: `gemini-2.0-flash` (latest model if available)
+- **Model:** `gemini-2.5-flash` (fast, efficient model)
+- Alternative: `gemini-3.0-flash` (latest model if available)
 
 ## CORS Configuration
 
