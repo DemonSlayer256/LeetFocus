@@ -13,19 +13,28 @@ function updateUI() {
     button.disabled = true;
     button.innerText = "No more hints";
   } else {
+    button.disabled = false;
     button.innerText = "View next hint";
   }
+  console.log("UI updated");
 }
 
 button.onclick = async () => {
   // First click: fetch all hints
+  console.log("Button clicked");
   if (hints.length === 0) {
+    button.disabled = true;
+    button.innerText = "Loading...";
+
     const res = await chrome.runtime.sendMessage({
       action: "getHints"
     });
 
-    if (res.error) {
-      output.innerText = res.error;
+    if (!res || res.error) {
+      console.log("Error fetching hints:", res?.error);
+      output.innerText = res?.error || "Failed to fetch hints";
+      button.disabled = false;
+      button.innerText = "Get Hint";
       return;
     }
 

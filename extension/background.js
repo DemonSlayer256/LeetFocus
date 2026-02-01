@@ -1,42 +1,63 @@
-let currentProblem = null;
-
-// Listen for content script updates
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  (async () => {
-    if (msg.action === "problemDetected") {
-      currentProblem = msg.problemData;
-      console.log("Problem updated:", currentProblem);
-      return;
-    }
 
-    if (msg.action === "getHints") {
-      if (!currentProblem) {
-        sendResponse({ error: "No problem detected yet." });
-        return;
-      }
+  if (msg.action === "problemDetected") {
+    const problemData = msg.problemData;
 
+    chrome.storage.local.set({ currentProblem: problemData }, () => {
+      console.log("Problem stored:", problemData);
+      sendResponse({ success: true });
+    });
+
+    return true; // async storage write
+  }
+
+  if (msg.action === "getHints") {
+    (async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/getHints", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            problemStatement: currentProblem.description,
-            difficulty: currentProblem.difficulty
-          })
-        });
+        const { currentProblem, hintsByProblem = {} } =
+          await chrome.storage.local.get(["currentProblem", "hintsByProblem"]);
 
-        const data = await response.json();
+        if (!currentProblem) {
+          console.log("Entered getHints but no currentProblem");
+          sendResponse({ error: "No problem detected yet." });
+          return;
+        }
+        const problemId =
+          currentProblem.id ||
+          currentProblem.slug ||
+          currentProblem.title;
+          
+        // CHECK CACHE
+        
+        if (hintsByProblem[problemId]) {
+          console.log("Returning cached hints");
+          sendResponse({ hints: hintsByProblem[problemId], cached: true });
+          return;
+        }
+        // FAKE API CALL (STUB)
+        
+        const hintsArray = [
+          "Hint 1: Think about edge cases.",
+          "Hint 2: Consider time complexity.",
+          "Hint 3: Can this be solved with a hash map?"
+        ];
 
-        // Convert { hint1, hint2, hint3 } → array
-        const hintsArray = [data.hint1, data.hint2, data.hint3].filter(Boolean);
+        await new Promise(resolve => setTimeout(resolve, 200));
+        console.log("Fetched new hints");
 
-        sendResponse({ hints: hintsArray });
+        // PERSIST TO STORAGE
+        hintsByProblem[problemId] = hintsArray;
+
+        await chrome.storage.local.set({ hintsByProblem });
+        //SEND RESPONSE
+        sendResponse({ hints: hintsArray, cached: false });
+
       } catch (err) {
         console.error(err);
         sendResponse({ error: "Failed to fetch hints." });
       }
+    })();
 
-      return true; // Keep message channel open for async
-    }
-  })();
+    return true;
+  }
 });

@@ -1,9 +1,8 @@
 // content.js
 // Runs on https://leetcode.com/problems/*
 
-// ---------------------------
 // Utility: wait for an element
-// ---------------------------
+
 function waitForElement(selector, timeout = 10000) {
   return new Promise((resolve) => {
     const element = document.querySelector(selector);
@@ -29,44 +28,48 @@ function waitForElement(selector, timeout = 10000) {
   });
 }
 
-// ---------------------------
 // Core scraper
-// ---------------------------
+
 function getProblemStatement() {
   // Title (fairly stable)
-  const titleEl = document.querySelector("h4");
+  const match = window.location.pathname.match(/^\/problems\/([^\/]+)/);
 
+  const slug = match[1]; // e.g., "two-sum"
+  
+  // Convert slug to readable title: "Two Sum"
+  const words = slug.split("-").map(
+    word => word.charAt(0).toUpperCase() + word.slice(1)
+  );
+  const titleEl =  words.join(" ");
   // Description container
   const descriptionEl = document.querySelector(
     '[data-track-load="description_content"]'
   );
-
-  // Difficulty (text-based, safest)
+  const description = descriptionEl ? descriptionEl.innerText.trim() : null;
   const difficultyEl = Array.from(document.querySelectorAll("span"))
     .find(el =>
       ["Easy", "Medium", "Hard"].includes(el.innerText.trim())
     );
 
-  if (!titleEl || !descriptionEl) {
+  if (!titleEl || !description) {
     return null;
   }
 
   return {
-    title: titleEl.innerText.trim(),
-    description: descriptionEl.innerText.trim(),
+    title: titleEl,
+    description: description,
     difficulty: difficultyEl?.innerText.trim() || "Unknown",
     url: window.location.href
   };
 }
 
-// ---------------------------
+
 // State
-// ---------------------------
+
 let lastProblemKey = null;
 
-// ---------------------------
 // Notify background if problem changes
-// ---------------------------
+
 function notifyIfProblemChanged() {
   const data = getProblemStatement();
   if (!data) return;
@@ -82,18 +85,16 @@ function notifyIfProblemChanged() {
   });
 }
 
-// ---------------------------
 // Initial load (important)
-// ---------------------------
+
 (async function init() {
   // Wait until the description actually exists
   await waitForElement('[data-track-load="description_content"]');
   notifyIfProblemChanged();
 })();
 
-// ---------------------------
 // SPA navigation detection
-// ---------------------------
+
 const observer = new MutationObserver(() => {
   notifyIfProblemChanged();
 });
@@ -103,9 +104,8 @@ observer.observe(document.body, {
   subtree: true
 });
 
-// ---------------------------
 // Message listener (popup/background pull access)
-// ---------------------------
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "getProblemStatement") {
     sendResponse({ problemData: getProblemStatement() });
