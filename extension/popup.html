@@ -3,22 +3,94 @@
 <head>
   <style>
     body {
-      font-family: sans-serif;
-      width: 280px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      width: 320px;
+      padding: 20px;
+      background-color: #f0f2f5;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    h2 {
+      margin: 0 0 15px 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #222;
+      text-align: center;
+    }
+
     button {
-      margin-top: 10px;
+      margin-top: 20px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 500;
+      border: none;
+      border-radius: 6px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      width: 100%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
-    .hint {
-      margin-top: 10px;
+
+    button:hover:not(:disabled) {
+      background-color: #45a049;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background-color: #a5d6a7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hint-container {
+      margin-top: 15px;
+      width: 100%;
+      text-align: left;
+    }
+
+    #hintOutput {
+      background: linear-gradient(145deg, #ffffff, #e6f0ea);
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1px solid #d0d0d0;
+      min-height: 70px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
       white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 14.5px;
+      color: #222;
+      font-weight: 400;
+      transition: background 0.2s ease;
+    }
+
+    #hintOutput:empty {
+      color: #999;
+      font-style: italic;
+    }
+
+    #hintCounter {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #555;
+      text-align: right;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
+  <h2> Coding Hints</h2>
+
+  <div class="hint-container">
+    <div id="hintOutput">Click "Get Hint" to see the first hint.</div>
+    <div id="hintCounter"></div>
+  </div>
+
   <button id="getHintBtn">Get Hint</button>
-  <div id="hintCounter"></div>
-  <div class="hint" id="hintOutput">3</div>
 
   <script src="popup.js"></script>
 </body>
