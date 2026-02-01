@@ -37,9 +37,8 @@ Problem Statement: ${problemStatement}
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent(prompt);
-    const hints = result.response.text();
-
-    res.json({ hints });
+    const hints = JSON.parse(await result.response.text());
+    res.json(hints); 
   } catch (error) {
     console.error("Gemini API error:", error.message);
     res.status(500).json({ error: "Failed to fetch hints from Gemini API", details: error.message });

@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       sendResponse({ success: true });
     });
 
-    return true; // async storage write
+    return true;
   }
 
   if (msg.action === "getHints") {
@@ -18,7 +18,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           await chrome.storage.local.get(["currentProblem", "hintsByProblem"]);
 
         if (!currentProblem) {
-          console.log("Entered getHints but no currentProblem");
           sendResponse({ error: "No problem detected yet." });
           return;
         }
@@ -26,34 +25,54 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           currentProblem.id ||
           currentProblem.slug ||
           currentProblem.title;
-          
-        // CHECK CACHE
-        
+
         if (hintsByProblem[problemId]) {
           console.log("Returning cached hints");
-          sendResponse({ hints: hintsByProblem[problemId], cached: true });
+          sendResponse({
+            hints: hintsByProblem[problemId],
+            cached: true
+          });
           return;
         }
-        // FAKE API CALL (STUB)
-        
+
+        const response = await fetch("https://leetfocus.com/api/getHints", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            problemStatement: currentProblem.description,
+            difficulty: currentProblem.difficulty
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
         const hintsArray = [
-          "Hint 1: Think about edge cases.",
-          "Hint 2: Consider time complexity.",
-          "Hint 3: Can this be solved with a hash map?"
-        ];
+          data.hint1,
+          data.hint2,
+          data.hint3
+        ].filter(Boolean);
 
-        await new Promise(resolve => setTimeout(resolve, 200));
-        console.log("Fetched new hints");
+        if (hintsArray.length === 0) {
+          throw new Error("No hints returned from API");
+        }
 
-        // PERSIST TO STORAGE
         hintsByProblem[problemId] = hintsArray;
 
         await chrome.storage.local.set({ hintsByProblem });
-        //SEND RESPONSE
-        sendResponse({ hints: hintsArray, cached: false });
+
+        sendResponse({
+          hints: hintsArray,
+          cached: false
+        });
 
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch hints:", err);
         sendResponse({ error: "Failed to fetch hints." });
       }
     })();
