@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const API_URL = "http://localhost:3000/api/getHints";
+const API_URL = "http://leetfocus.vercel.app/api/getHints";
 
 async function testAPI() {
   const testPayload = {
