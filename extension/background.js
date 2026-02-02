@@ -35,7 +35,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           return;
         }
 
-        const response = await fetch("https://leetfocus.com/api/getHints", {
+        const response = await fetch("https://leetfocus.vercel.app/api/getHints", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

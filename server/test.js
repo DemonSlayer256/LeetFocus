@@ -38,7 +38,7 @@ async function testAPI() {
 
     const data = await response.json();
     console.log("\n✅ Success! Received hints:\n");
-    console.log(data.hints);
+    console.log(data.hint1, data.hint2, data.hint3);
     console.log("\n✨ API is working correctly!");
 
   } catch (error) {

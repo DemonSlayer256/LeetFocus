@@ -9,7 +9,7 @@
   ],
   "host_permissions": [
     "https://leetcode.com/*",
-    "https://leetfocus.com/"
+    "https://leetfocus.vercel.app/"
   ],
   "background": {
     "service_worker": "background.js"

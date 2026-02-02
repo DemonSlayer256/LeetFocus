@@ -57,7 +57,9 @@ Get hints for a LeetCode problem.
 **Response:**
 ```json
 {
-  "hints": "1. Use a hash map to store seen numbers...\n2. Iterate through the array...\n3. Return the indices..."
+  "hint1": "Use a hash map to store seen numbers...\n",
+  "hint2": "Iterate through the array...\n",
+  "hint3": "Return the indices..."
 }
 ```
 
